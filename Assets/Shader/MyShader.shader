@@ -7,9 +7,10 @@ Shader "Custom/UnlitTextureMix"
 	_Tex2("Texture2", 2D) = "white" {} // текстура2
 	_MixValue("Mix Value", Range(0,1)) = 0.5 // параметр смешивания текстур
 	_Color("Main Color", COLOR) = (1,1,1,1) // цвет окрашивания
-		_Power("Power", Range(-20,20)) = 0.5 // сила изгиба
+		_Power1("Power1", Range(-20,20)) = 0.5 // сила изгиба
+		_Power2("Power2", Range(-20,20)) = 0.5 // высота
 		_Height("Height", Range(-20,20)) = 0.5 // высота
-		_Height1("Height1", Range(-20,20)) = 0.5 // высота
+		
 	}
 		//сабшейдер
 		SubShader
@@ -32,9 +33,10 @@ Shader "Custom/UnlitTextureMix"
 			float4 _Tex2_ST;
 			float _MixValue; // параметр смешивания
 			float4 _Color; // цвет, которым будет окрашиваться изображение
-			float _Power; // сила изгиба
+			float _Power1; // сила изгиба
+			float _Power2; // высота
 			float _Height; // высота
-			float _Height1; // высота
+			
 			struct appdata 
 			{
 				float4 vertex: SV_POSITION;
@@ -51,8 +53,8 @@ Shader "Custom/UnlitTextureMix"
 			v2f vert(appdata_full v)
 			{
 				v2f result;
-				//v.vertex.xyz += v.normal * _Power * v.texcoord.x * v.texcoord.x - v.normal * _Height1 * v.texcoord.x + v.normal * _Height;
-				v.vertex.xyz += _Height * sin(v.normal * _Power * v.texcoord.x) + v.normal * _Height1 * v.texcoord.x;
+				v.vertex.xyz += v.normal * _Power1 * v.texcoord.x * v.texcoord.x - v.normal * _Power2 * v.texcoord.x + v.normal * _Height;
+				//v.vertex.xyz += _Height * sin(v.normal * _Power * v.texcoord.x) + v.normal * _Height1 * v.texcoord.x;
 				result.vertex = UnityObjectToClipPos(v.vertex);
 				result.uv = TRANSFORM_TEX(v.texcoord, _Tex1);
 				

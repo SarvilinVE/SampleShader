@@ -2,6 +2,7 @@ Shader "Custom/PostEffectAtmosphere/Planet Atmosphere"
 {
 	Properties
 	{
+        _MainTex ("Texture", 2D) = "white"{}
 		_AtmosphereColor ("Atmosphere Color", Color) = (1,1,1,1)
 		_AtmosphereSize ("Atmosphere Size", float) = 1.1
 		_Ambient ("Ambient", float) = 0
@@ -14,6 +15,53 @@ Shader "Custom/PostEffectAtmosphere/Planet Atmosphere"
 		LOD 200
 
 		blend SrcAlpha OneMinusSrcAlpha
+
+
+			pass
+		{
+
+			CGPROGRAM
+			#pragma vertex vert // директива для обработки вершин
+			#pragma fragment frag // директива для обработки фрагментов
+			#include "UnityCG.cginc" // библиотека с полезными функциями
+
+
+
+			sampler2D _MainTex; // текстура1
+			float4 _MainTex_ST;
+
+			struct appdata
+			{
+				float4 vertex: SV_POSITION;
+				float4 uv: TEXCOORD0;
+			};
+			// структура, которая помогает преобразовать данные вершины в данные
+				//фрагмента
+			struct v2f
+			{
+				float2 uv : TEXCOORD0; // UV-координаты вершины
+				float4 vertex : SV_POSITION; // координаты вершины
+			};
+			//здесь происходит обработка вершин
+			v2f vert(appdata_full v)
+			{
+				v2f result;
+				result.vertex = UnityObjectToClipPos(v.vertex);
+				result.uv = TRANSFORM_TEX(v.texcoord, _MainTex);
+
+				return result;
+			}
+			//здесь происходит обработка пикселей, цвет пикселей умножается на цвет
+				//материала
+			fixed4 frag(v2f i) : SV_Target
+			{
+				fixed4 color;
+				color = tex2D(_MainTex, i.uv);
+				return color;
+			}
+
+			ENDCG
+		}
 
 		pass
 		{
@@ -65,6 +113,8 @@ Shader "Custom/PostEffectAtmosphere/Planet Atmosphere"
    			}
    			ENDCG
 		}
+
+		
 	}
 	Fallback "Diffuse"
 }
